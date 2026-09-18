@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>FutabaViewer ダウンロード</title>
+<!--
+  README のボタンの飛び先(GitHub Pages)。README には http(s) のリンクしか置けず、
+  配布物のファイル名には版が入るので、ここで「系統の最新 Release」を引いて本物へ飛ばす。
+
+  ?line=FixPatch|old-ui&file=apk|apk-zipsigner|ipa|exe|msi … その系統の最新 Release の該当ファイル
+  ?app=obtainium&line=FixPatch|old-ui                       … Obtainium にその系統を登録する
+  ?app=livecontainer|sidestore                              … iOS のソース(source.json)を登録する
+-->
+<style>
+  :root { --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --accent: #0969da; --line: #d1d9e0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --accent: #4493f8; --line: #3d444d; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 16px/1.6 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif; }
+  main { max-width: 36rem; margin: 0 auto; padding: 48px 16px; }
+  h1 { font-size: 1.25rem; margin: 0 0 12px; }
+  p { margin: 8px 0; color: var(--muted); }
+  a.button { display: inline-block; margin: 16px 8px 0 0; padding: 10px 18px; border-radius: 8px;
+             background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; }
+  a.plain { color: var(--accent); }
+  code { font-size: .85em; word-break: break-all; border: 1px solid var(--line); border-radius: 4px; padding: 1px 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">FutabaViewer</h1>
+  <p id="message">準備しています…</p>
+  <div id="actions"></div>
+  <p><a class="plain" id="releases" href="https://github.com/fixpatch/futabaviewer-build/releases">Release の一覧</a></p>
+</main>
+<script>
+(function () {
+  var REPO = 'fixpatch/futabaviewer-build';
+  var SOURCE_JSON = 'https://github.com/' + REPO + '/releases/latest/download/source.json';
+  var LINES = { 'FixPatch': 'FixPatch', 'old-ui': 'old-ui' };
+  var FILES = {
+    'apk':           { label: 'Android APK(新署名版)',     match: /-new-signature\.apk$/ },
+    'apk-zipsigner': { label: 'Android APK(ZipSigner版)',  match: /-zipsigner\.apk$/ },
+    'ipa':           { label: 'iOS IPA',                    match: /^FutabaViewer-iOS-(?!.*-Debug\.ipa$).*\.ipa$/ },
+    'exe':           { label: 'Windows インストーラー(.exe)', match: /^FutabaViewer-Windows-.*\.exe$/ },
+    'msi':           { label: 'Windows インストーラー(.msi)', match: /^FutabaViewer-Windows-.*\.msi$/ }
+  };
+  var APPS = {
+    'livecontainer': { label: 'LiveContainer', scheme: 'livecontainer://source?url=' },
+    'sidestore':     { label: 'SideStore',     scheme: 'sidestore://source?url=' }
+  };
+
+  // Obtainium に登録するアプリ。同じリポジトリに2系統が同居するので、Release の名前(= タグ)で絞る。
+  // APK は新署名版。版の見分けは Release のタグ(アプリの versionName とは形が違うので検出はしない)。
+  var OBTAINIUM = {
+    'FixPatch': { id: 'jp.andosan.futabaviewer.kai', name: 'ふたばビューア改 FixPatch' },
+    'old-ui':   { id: 'jp.andosan.futabaviewer',     name: 'ふたばビューア改 old-ui' }
+  };
+
+  var params = new URLSearchParams(location.search);
+  var title = document.getElementById('title');
+  var message = document.getElementById('message');
+  var actions = document.getElementById('actions');
+
+  function button(text, href) {
+    var a = document.createElement('a');
+    a.className = 'button';
+    a.textContent = text;
+    a.href = href;
+    actions.appendChild(a);
+  }
+
+  if (params.get('app') === 'obtainium' && OBTAINIUM[params.get('line')]) {
+    var lineName = LINES[params.get('line')];
+    var target = OBTAINIUM[lineName];
+    var config = {
+      id: target.id,
+      url: 'https://github.com/' + REPO,
+      author: 'fixpatch',
+      name: target.name,
+      preferredApkIndex: 0,
+      additionalSettings: JSON.stringify({
+        includePrereleases: false,
+        fallbackToOlderReleases: true,
+        filterReleaseTitlesByRegEx: '^' + lineName,
+        filterReleaseNotesByRegEx: '',
+        verifyLatestTag: false,
+        sortMethodChoice: 'date',
+        apkFilterRegEx: '-new-signature\\.apk$',
+        invertAPKFilter: false,
+        autoApkFilterByArch: false,
+        versionDetection: false,
+        releaseDateAsVersion: false,
+        trackOnly: false
+      })
+    };
+    var obtainium = 'obtainium://app/' + encodeURIComponent(JSON.stringify(config));
+    title.textContent = 'Obtainium に ' + target.name + ' を追加';
+    message.textContent = 'Obtainium が開かない時は下のボタンを押してください(Android で Obtainium を入れておく必要があります)。';
+    button('Obtainium で開く', obtainium);
+    location.href = obtainium;
+    return;
+  }
+
+  var app = APPS[params.get('app')];
+  if (app) {
+    var link = app.scheme + encodeURIComponent(SOURCE_JSON);
+    title.textContent = app.label + ' にソースを追加';
+    message.innerHTML = '';
+    message.appendChild(document.createTextNode(
+      app.label + ' が開かない時は下のボタンを押すか、ソースに次の URL を手で追加してください: '));
+    var code = document.createElement('code');
+    code.textContent = SOURCE_JSON;
+    message.appendChild(code);
+    button(app.label + ' で開く', link);
+    location.href = link;
+    return;
+  }
+
+  var line = LINES[params.get('line')];
+  var file = FILES[params.get('file')];
+  if (!line || !file) {
+    message.textContent = 'リンクが正しくありません。Release の一覧から選んでください。';
+    return;
+  }
+  title.textContent = line + ' の ' + file.label;
+  document.getElementById('releases').href = line === 'FixPatch'
+    ? 'https://github.com/' + REPO + '/releases/latest'
+    : 'https://github.com/' + REPO + '/releases?q=' + encodeURIComponent(line) + '&expanded=true';
+
+  fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=50', {
+    headers: { 'Accept': 'application/vnd.github+json' }
+  }).then(function (response) {
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.json();
+  }).then(function (releases) {
+    var latest = releases
+      .filter(function (r) { return !r.draft && !r.prerelease && r.tag_name.indexOf(line) === 0; })
+      .sort(function (a, b) { return Date.parse(b.published_at) - Date.parse(a.published_at); })[0];
+    if (!latest) throw new Error('no release');
+    var asset = latest.assets.filter(function (a) { return file.match.test(a.name); })[0];
+    if (!asset) throw new Error('no asset');
+    message.textContent = latest.tag_name + ' の ' + asset.name + ' をダウンロードします。始まらない時は下のボタンを押してください。';
+    button('ダウンロード', asset.browser_download_url);
+    location.replace(asset.browser_download_url);
+  }).catch(function () {
+    message.textContent = '最新版を調べられませんでした。Release の一覧からダウンロードしてください。';
+  });
+})();
+</script>
+</body>
+</html>

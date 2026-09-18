@@ -1,5 +1,5 @@
 # iOS の IPA だけを試しに作る(Release には置かない。Artifacts から取る)。
-# 配布用はタグから動く release.yml を使う。
+# 配布用はタグから動く release-fixpatch.yml / release-old-ui.yml を使う。
 name: iOS IPA
 
 on:

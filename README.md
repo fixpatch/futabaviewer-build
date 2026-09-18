@@ -16,18 +16,34 @@ It does not contain application source code.
 
 ### ダウンロード
 
-| 系統 | 最新 |
+#### FixPatch(master 系)
+
+[![Release](https://img.shields.io/github/v/release/fixpatch/futabaviewer-build?filter=FixPatch*&label=Release)](https://github.com/fixpatch/futabaviewer-build/releases/latest) [![Build](https://img.shields.io/github/actions/workflow/status/fixpatch/futabaviewer-build/release-fixpatch.yml?branch=main&label=Build)](https://github.com/fixpatch/futabaviewer-build/actions/workflows/release-fixpatch.yml)
+
+| | |
 |---|---|
-| master 系(FixPatch〇〇)| [releases/latest](https://github.com/fixpatch/futabaviewer-build/releases/latest) |
-| old-ui 系(old-ui〇〇)| [old-ui の Release 一覧(新しい順)](https://github.com/fixpatch/futabaviewer-build/releases?q=old-ui&expanded=true) |
+| Android | [![Get it on Obtainium](https://img.shields.io/badge/Get_it_on-Obtainium-7F57C2?style=for-the-badge&logo=obtainium&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=obtainium&line=FixPatch) [![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=apk) <br>[ZipSigner版(旧署名)の APK](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=apk-zipsigner) |
+| iOS | [![Install with LiveContainer](https://img.shields.io/badge/Install_with-LiveContainer-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=livecontainer) [![Download IPA](https://img.shields.io/badge/Download-IPA-555555?style=for-the-badge&logo=apple&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=ipa) <br>[SideStore にソースを追加](https://fixpatch.github.io/futabaviewer-build/get/?app=sidestore) |
+| Windows | [![Download Installer](https://img.shields.io/badge/Download-Installer-0078D4?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg%3D%3D&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=exe) <br>[.msi 版](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=msi) |
 
-GitHub の「Latest」は1つしか付けられないので、master 系に固定している(old-ui を出しても Latest は移らない)。
+#### old-ui
 
-自動アップデート: Android は Obtainium、iOS は LiveContainer / SideStore にソース `https://github.com/fixpatch/futabaviewer-build/releases/latest/download/source.json` を登録する(手順は Wiki の「自動アップデート」)。
+[![Release](https://img.shields.io/github/v/release/fixpatch/futabaviewer-build?filter=old-ui*&label=Release)](https://github.com/fixpatch/futabaviewer-build/releases?q=old-ui&expanded=true) [![Build](https://img.shields.io/github/actions/workflow/status/fixpatch/futabaviewer-build/release-old-ui.yml?branch=main&label=Build)](https://github.com/fixpatch/futabaviewer-build/actions/workflows/release-old-ui.yml)
+
+| | |
+|---|---|
+| Android | [![Get it on Obtainium](https://img.shields.io/badge/Get_it_on-Obtainium-7F57C2?style=for-the-badge&logo=obtainium&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=obtainium&line=old-ui) [![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=old-ui&file=apk) <br>[ZipSigner版(旧署名)の APK](https://fixpatch.github.io/futabaviewer-build/get/?line=old-ui&file=apk-zipsigner) |
+
+- ボタンは [GitHub Pages の中継ページ](docs/get/index.html)を通る。README には http(s) のリンクしか置けず(`obtainium://` などは消される)、
+  配布物のファイル名には版が入るので、中継ページが「その系統の最新 Release」を引いて本物へ飛ばす。
+- Obtainium は Release の名前(`^FixPatch` / `^old-ui`)で系統を絞り、新署名版の APK を取る。ZipSigner版を使っている人は Obtainium の設定で APK フィルタを `-zipsigner\.apk$` に変える。
+- iOS のソース: `https://github.com/fixpatch/futabaviewer-build/releases/latest/download/source.json`(LiveContainer / SideStore / AltStore)。
+- Windows 版はアプリの起動時に新しい版を確かめ、タイトルバーに「更新あり」を出す(押すとインストーラーを落として入れ替える)。
+- GitHub の「Latest」は1つしか付けられないので、master 系に固定している(old-ui を出しても Latest は移らない)。
 
 | workflow | 起動 | 成果物 |
 |---|---|---|
-| [Release](.github/workflows/release.yml) | 本体で `FixPatch〇〇` / `old-ui〇〇` のタグを push(または手動) | Release に APK(新署名版・ZipSigner版)、master 系は Windows インストーラーと iOS IPA も |
+| [Release FixPatch](.github/workflows/release-fixpatch.yml) / [Release old-ui](.github/workflows/release-old-ui.yml)(中身は [_release.yml](.github/workflows/_release.yml)) | 本体で `FixPatch〇〇` / `old-ui〇〇` のタグを push(または手動) | Release に APK(新署名版・ZipSigner版)、master 系は Windows インストーラーと iOS IPA も |
 | [iOS IPA](.github/workflows/ios-ipa.yml) | 手動 | iOS 未署名 IPA(Artifacts のみ・試し用) |
 
 - 使い方と構成: [docs/CI.md](docs/CI.md)

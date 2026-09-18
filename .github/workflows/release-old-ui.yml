@@ -1,0 +1,28 @@
+# old-ui 系の Release を作る呼び口。中身は _release.yml(系統を問わず共通)。
+# README の Build バッジはこのファイルの実行結果を出す —— 系統ごとに分けてあるのはそのため。
+#
+# 本体のタグ push で本体側の dispatch-build.yml がこれを起動する。手動でも Run workflow から動かせる。
+name: Release old-ui
+run-name: Release ${{ inputs.tag }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 本体のタグ(old-ui〇〇)
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    uses: ./.github/workflows/_release.yml
+    with:
+      tag: ${{ inputs.tag }}
+      line: old-ui
+    secrets: inherit

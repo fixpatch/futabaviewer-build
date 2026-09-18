@@ -1,25 +1,24 @@
-# 本体(非公開)のタグから、配布物をまとめて作ってこのリポジトリの Release に置く。
+# 本体(非公開)のタグから、配布物をまとめて作ってこのリポジトリの Release に置く(再利用 workflow)。
 #
 # - FixPatch〇〇 … master 系: Android APK(新署名版 / ZipSigner版)+ Windows インストーラー + iOS IPA
 # - old-ui〇〇   … old-ui 系: Android APK(新署名版 / ZipSigner版)だけ
 #
-# 本体のタグ push で本体側の dispatch-build.yml がこれを起動する。手動でも Run workflow から動かせる。
-name: Release
-run-name: Release ${{ inputs.tag }}
+# 呼び口は系統ごとに分けてある(release-fixpatch.yml / release-old-ui.yml)。README の Build バッジを
+# 系統ごとに出すため(バッジは workflow ファイル単位でしか取れない)。本体のタグ push で本体側の
+# dispatch-build.yml がタグの頭で呼び口を選んで起動する。
+name: Release (reusable)
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       tag:
         description: 本体のタグ(FixPatch〇〇 / old-ui〇〇)
+        type: string
         required: true
-
-permissions:
-  contents: write
-
-concurrency:
-  group: release-${{ inputs.tag }}
-  cancel-in-progress: false
+      line:
+        description: master / old-ui(呼び口が決める)
+        type: string
+        required: true
 
 jobs:
   resolve:
@@ -30,15 +29,18 @@ jobs:
       - id: resolve
         env:
           TAG: ${{ inputs.tag }}
+          LINE: ${{ inputs.line }}
         run: |
-          if ! [[ "$TAG" =~ ^(FixPatch|old-ui)[0-9A-Za-z._-]*$ ]]; then
-            echo "::error::タグは FixPatch〇〇 か old-ui〇〇 にしてください"
+          case "$LINE" in
+            master) pattern='^FixPatch[0-9A-Za-z._-]*$' ;;
+            old-ui) pattern='^old-ui[0-9A-Za-z._-]*$' ;;
+            *) echo "::error::line は master か old-ui"; exit 1 ;;
+          esac
+          if ! [[ "$TAG" =~ $pattern ]]; then
+            echo "::error::タグ $TAG は $LINE 系の呼び口では作れません(FixPatch〇〇 → Release FixPatch / old-ui〇〇 → Release old-ui)"
             exit 1
           fi
-          case "$TAG" in
-            FixPatch*) echo "line=master" >> "$GITHUB_OUTPUT" ;;
-            old-ui*)   echo "line=old-ui" >> "$GITHUB_OUTPUT" ;;
-          esac
+          echo "line=$LINE" >> "$GITHUB_OUTPUT"
 
   android:
     needs: resolve
