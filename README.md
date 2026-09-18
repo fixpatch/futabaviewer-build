@@ -20,19 +20,25 @@ It does not contain application source code.
 
 [![Release](https://img.shields.io/github/v/release/fixpatch/futabaviewer-build?filter=FixPatch*&label=Release)](https://github.com/fixpatch/futabaviewer-build/releases/latest) [![Build](https://img.shields.io/github/actions/workflow/status/fixpatch/futabaviewer-build/release-fixpatch.yml?branch=main&label=Build)](https://github.com/fixpatch/futabaviewer-build/actions/workflows/release-fixpatch.yml)
 
-| | |
-|---|---|
-| Android | [![Get it on Obtainium](https://img.shields.io/badge/Get_it_on-Obtainium-7F57C2?style=for-the-badge&logo=obtainium&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=obtainium&line=FixPatch) [![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=apk) <br>[ZipSigner版(旧署名)の APK](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=apk-zipsigner) |
-| iOS | [![Install with LiveContainer](https://img.shields.io/badge/Install_with-LiveContainer-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=livecontainer) [![Download IPA](https://img.shields.io/badge/Download-IPA-555555?style=for-the-badge&logo=apple&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=ipa) <br>[SideStore にソースを追加](https://fixpatch.github.io/futabaviewer-build/get/?app=sidestore) |
-| Windows | [![Download Installer](https://img.shields.io/badge/Download-Installer-0078D4?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg%3D%3D&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=exe) <br>[.msi 版](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=msi) |
+**Android**
+
+[![Get it on Obtainium](https://img.shields.io/badge/GET_IT_ON-Obtainium-7F57C2?style=for-the-badge&logo=obtainium&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=obtainium&line=FixPatch) [![Download APK](https://img.shields.io/badge/DOWNLOAD-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=apk)
+
+**iOS**
+
+[![Get it on LiveContainer](https://img.shields.io/badge/GET_IT_ON-LiveContainer-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=livecontainer) [![Get it on SideStore](https://img.shields.io/badge/GET_IT_ON-SideStore-8E44AD?style=for-the-badge&logo=apple&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=sidestore) [![Download IPA](https://img.shields.io/badge/DOWNLOAD-IPA-555555?style=for-the-badge&logo=apple&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=ipa)
+
+**Windows**
+
+[![Download Installer](https://img.shields.io/badge/DOWNLOAD-Installer-0078D4?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0wIDBoMTEuNHYxMS40SDB6TTEyLjYgMEgyNHYxMS40SDEyLjZ6TTAgMTIuNmgxMS40VjI0SDB6TTEyLjYgMTIuNkgyNFYyNEgxMi42eiIvPjwvc3ZnPg%3D%3D&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=FixPatch&file=exe)
 
 #### old-ui
 
 [![Release](https://img.shields.io/github/v/release/fixpatch/futabaviewer-build?filter=old-ui*&label=Release)](https://github.com/fixpatch/futabaviewer-build/releases?q=old-ui&expanded=true) [![Build](https://img.shields.io/github/actions/workflow/status/fixpatch/futabaviewer-build/release-old-ui.yml?branch=main&label=Build)](https://github.com/fixpatch/futabaviewer-build/actions/workflows/release-old-ui.yml)
 
-| | |
-|---|---|
-| Android | [![Get it on Obtainium](https://img.shields.io/badge/Get_it_on-Obtainium-7F57C2?style=for-the-badge&logo=obtainium&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=obtainium&line=old-ui) [![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=old-ui&file=apk) <br>[ZipSigner版(旧署名)の APK](https://fixpatch.github.io/futabaviewer-build/get/?line=old-ui&file=apk-zipsigner) |
+**Android**
+
+[![Get it on Obtainium](https://img.shields.io/badge/GET_IT_ON-Obtainium-7F57C2?style=for-the-badge&logo=obtainium&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=obtainium&line=old-ui) [![Download APK](https://img.shields.io/badge/DOWNLOAD-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=old-ui&file=apk)
 
 - ボタンは [GitHub Pages の中継ページ](docs/get/index.html)を通る。README には http(s) のリンクしか置けず(`obtainium://` などは消される)、
   配布物のファイル名には版が入るので、中継ページが「その系統の最新 Release」を引いて本物へ飛ばす。
