@@ -54,7 +54,8 @@
   };
 
   // Obtainium に登録するアプリ。同じリポジトリに2系統が同居するので、Release の名前(= タグ)で絞る。
-  // APK は新署名版。版の見分けは Release のタグ(アプリの versionName とは形が違うので検出はしない)。
+  // APK は絞らない —— 更新の時に Obtainium が新署名版 / ZipSigner版のどちらにするか訊く。
+  // 版の見分けは Release のタグ(アプリの versionName とは形が違うので検出はしない)。
   var OBTAINIUM = {
     'FixPatch': { id: 'jp.andosan.futabaviewer.kai', name: 'ふたばビューア改 FixPatch' },
     'old-ui':   { id: 'jp.andosan.futabaviewer',     name: 'ふたばビューア改 old-ui' }
@@ -81,7 +82,6 @@
       url: 'https://github.com/' + REPO,
       author: 'fixpatch',
       name: target.name,
-      preferredApkIndex: 0,
       additionalSettings: JSON.stringify({
         includePrereleases: false,
         fallbackToOlderReleases: true,
@@ -89,7 +89,7 @@
         filterReleaseNotesByRegEx: '',
         verifyLatestTag: false,
         sortMethodChoice: 'date',
-        apkFilterRegEx: '-new-signature\\.apk$',
+        apkFilterRegEx: '',
         invertAPKFilter: false,
         autoApkFilterByArch: false,
         versionDetection: false,

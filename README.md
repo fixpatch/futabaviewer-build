@@ -36,7 +36,7 @@ It does not contain application source code.
 
 - ボタンは [GitHub Pages の中継ページ](docs/get/index.html)を通る。README には http(s) のリンクしか置けず(`obtainium://` などは消される)、
   配布物のファイル名には版が入るので、中継ページが「その系統の最新 Release」を引いて本物へ飛ばす。
-- Obtainium は Release の名前(`^FixPatch` / `^old-ui`)で系統を絞り、新署名版の APK を取る。ZipSigner版を使っている人は Obtainium の設定で APK フィルタを `-zipsigner\.apk$` に変える。
+- Obtainium は Release の名前(`^FixPatch` / `^old-ui`)で系統だけを絞る。APK は絞らないので、更新の時に新署名版 / ZipSigner版のどちらを入れるか選ぶ画面が出る。
 - iOS のソース: `https://github.com/fixpatch/futabaviewer-build/releases/latest/download/source.json`(LiveContainer / SideStore / AltStore)。
 - Windows 版はアプリの起動時に新しい版を確かめ、タイトルバーに「更新あり」を出す(押すとインストーラーを落として入れ替える)。
 - GitHub の「Latest」は1つしか付けられないので、master 系に固定している(old-ui を出しても Latest は移らない)。
