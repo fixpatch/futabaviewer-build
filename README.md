@@ -23,6 +23,8 @@ It does not contain application source code.
 
 GitHub の「Latest」は1つしか付けられないので、master 系に固定している(old-ui を出しても Latest は移らない)。
 
+自動アップデート: Android は Obtainium、iOS は LiveContainer / SideStore にソース `https://github.com/fixpatch/futabaviewer-build/releases/latest/download/source.json` を登録する(手順は Wiki の「自動アップデート」)。
+
 | workflow | 起動 | 成果物 |
 |---|---|---|
 | [Release](.github/workflows/release.yml) | 本体で `FixPatch〇〇` / `old-ui〇〇` のタグを push(または手動) | Release に APK(新署名版・ZipSigner版)、master 系は Windows インストーラーと iOS IPA も |

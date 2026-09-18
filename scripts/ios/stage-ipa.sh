@@ -10,10 +10,15 @@ configuration=${2:?構成を指定してください}
 ipa="$source_dir/app-ios/dist/FutabaViewer.ipa"
 test -f "$ipa" || { echo "::error::IPA がありません: $ipa"; exit 1; }
 
-# 版は iOS の表示名(AppServicesIos.kt)の最後の語(例: "3.0.2β FixPatch20" → FixPatch20)。
+# 版は表示名の最後の語(例: "3.0.2β FixPatch20" → FixPatch20)。表示名は本体の version.properties の versionName。
+# version.properties が無い古いタグ(FixPatch20-1 まで)は AppServicesIos.kt の定数から読む。
 # ★「β」など英数字以外を名前に入れない。GitHub の Release に上げると「.」に置き換えられる。
-version_name=$(sed -n 's/^private const val IOS_VERSION_NAME = "\(.*\)"$/\1/p' \
-    "$source_dir/data/src/iosMain/kotlin/jp/andosan/futabaviewer/data/AppServicesIos.kt")
+if [ -f "$source_dir/version.properties" ]; then
+    version_name=$(sed -n 's/^versionName=//p' "$source_dir/version.properties" | tr -d '\r')
+else
+    version_name=$(sed -n 's/^private const val IOS_VERSION_NAME = "\(.*\)"$/\1/p' \
+        "$source_dir/data/src/iosMain/kotlin/jp/andosan/futabaviewer/data/AppServicesIos.kt")
+fi
 label=${version_name##* }
 if ! [[ "$label" =~ ^[0-9A-Za-z][0-9A-Za-z.-]*$ ]]; then
     echo "::error::表示名の形式が想定外です: ${version_name:-(空)}"
@@ -29,7 +34,19 @@ mkdir -p out
 cp "$ipa" "out/$file"
 shasum -a 256 "out/$file"
 
+# SideStore / LiveContainer のソース(source.json)に載せるアイコン。IPA の中のアイコンは Xcode が
+# 独自形式に圧縮していて普通の PNG として読めないので、本体の元画像を使う。
+icon="$source_dir/app-ios/FutabaViewer/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png"
+icon_path=
+if [ "$configuration" = Release ] && [ -f "$icon" ]; then
+    cp "$icon" out/FutabaViewer-iOS-icon.png
+    icon_path=out/FutabaViewer-iOS-icon.png
+fi
+
 {
     echo "file=$file"
-    echo "path=out/$file"
+    echo "path<<EOF"
+    echo "out/$file"
+    [ -z "$icon_path" ] || echo "$icon_path"
+    echo "EOF"
 } >> "$GITHUB_OUTPUT"

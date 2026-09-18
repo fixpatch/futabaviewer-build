@@ -75,10 +75,17 @@ jobs:
        (needs.windows.result == 'success' && needs.ios.result == 'success'))
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
+
       - uses: actions/download-artifact@v7
         with:
           path: dist
           merge-multiple: true
+
+      # master 系だけ iOS がある。SideStore / LiveContainer に登録するソース(Latest の source.json)を作る。
+      - name: SideStore / LiveContainer のソース
+        if: needs.resolve.outputs.line == 'master'
+        run: python3 scripts/release/altstore-source.py dist "${{ inputs.tag }}" dist/source.json
 
       - name: チェックサム
         run: |
@@ -100,6 +107,7 @@ jobs:
             if [ "$LINE" = master ]; then
               echo '| `FutabaViewer-Windows-*.exe` / `.msi` | Windows インストーラー |'
               echo '| `FutabaViewer-iOS-*.ipa` | iOS(SideStore 用の未署名 IPA) |'
+              echo '| `source.json` / `FutabaViewer-iOS-icon.png` | SideStore / LiveContainer に登録するソース(自動更新用) |'
             fi
             echo '| `SHA256SUMS.txt` | 各ファイルの SHA-256 |'
             echo
