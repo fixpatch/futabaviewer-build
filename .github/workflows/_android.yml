@@ -64,6 +64,20 @@ jobs:
           ZIPSIGNER_CERT_SHA256: ${{ vars.ZIPSIGNER_CERT_SHA256 }}
         run: bash scripts/android/sign-and-stage.sh source
 
+      # Release の説明文(Obtainium の変更点)と source.json(SideStore の What's New)に使う。
+      # 本体のソースがあるのはこのジョブなので、ここで更新履歴からそのタグの節を抜き出しておく。
+      - name: 変更点(更新履歴から)
+        run: |
+          mkdir -p notes
+          python3 scripts/release/change-log-notes.py source "${{ inputs.source_ref }}" notes/release-notes
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: release-notes
+          path: notes/*
+          if-no-files-found: ignore
+          retention-days: ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }}
+
       - uses: actions/upload-artifact@v6
         with:
           name: android-apk-${{ inputs.line }}

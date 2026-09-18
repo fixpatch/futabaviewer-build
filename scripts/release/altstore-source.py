@@ -8,7 +8,10 @@ publish で dist/ の IPA から版を読み、Release に添付する。Latest 
 更新の見分けは IPA の CFBundleShortVersionString(version)と CFBundleVersion(buildVersion)。
 buildVersion は本体の version.properties の versionCode で、リリースごとに増える。
 
-引数: dist ディレクトリ、タグ、出力先。環境変数 GITHUB_REPOSITORY を使う。
+What's New(versions[].localizedDescription)には、本体の更新履歴から抜き出したそのタグの節
+(change-log-notes.py の .txt)を入れる。無ければ「アプリ内の更新履歴を参照」。
+
+引数: dist ディレクトリ、タグ、出力先、変更点の .txt(省略可)。環境変数 GITHUB_REPOSITORY を使う。
 """
 import datetime
 import glob
@@ -19,6 +22,7 @@ import sys
 import zipfile
 
 dist, tag, output = sys.argv[1:4]
+notes_path = sys.argv[4] if len(sys.argv) > 4 else None
 repository = os.environ["GITHUB_REPOSITORY"]
 download = f"https://github.com/{repository}/releases/download/{tag}"
 
@@ -39,7 +43,11 @@ size = os.path.getsize(ipa)
 date = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 ipa_url = f"{download}/{os.path.basename(ipa)}"
 icon_url = f"{download}/FutabaViewer-iOS-icon.png" if os.path.exists(os.path.join(dist, "FutabaViewer-iOS-icon.png")) else None
-description = f"{tag}(変更点はアプリ内の「更新履歴」を参照)"
+notes = ""
+if notes_path and os.path.exists(notes_path):
+    with open(notes_path, encoding="utf-8") as f:
+        notes = f.read().strip()
+description = f"{tag}\n\n{notes}" if notes else f"{tag}(変更点はアプリ内の「更新履歴」を参照)"
 
 app = {
     "name": "ふたばビューア改",

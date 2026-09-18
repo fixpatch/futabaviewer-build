@@ -84,10 +84,17 @@ jobs:
           path: dist
           merge-multiple: true
 
+      # 変更点は Release に添付しない(説明文と source.json に入れるだけ)。無い時は「アプリ内の更新履歴を参照」。
+      - name: 変更点を取り分ける
+        run: |
+          mkdir -p notes
+          mv dist/release-notes.* notes/ 2>/dev/null || true
+          ls -l notes
+
       # master 系だけ iOS がある。SideStore / LiveContainer に登録するソース(Latest の source.json)を作る。
       - name: SideStore / LiveContainer のソース
         if: needs.resolve.outputs.line == 'master'
-        run: python3 scripts/release/altstore-source.py dist "${{ inputs.tag }}" dist/source.json
+        run: python3 scripts/release/altstore-source.py dist "${{ inputs.tag }}" dist/source.json notes/release-notes.txt
 
       - name: チェックサム
         run: |
@@ -102,6 +109,14 @@ jobs:
           {
             echo "FutabaViewer ${TAG}"
             echo
+            if [ -s notes/release-notes.md ]; then
+              echo "## 変更点"
+              echo
+              cat notes/release-notes.md
+              echo
+              echo "## ファイル"
+              echo
+            fi
             echo "| ファイル | 内容 |"
             echo "|---|---|"
             echo '| `*-new-signature.apk` | Android 新署名版 |'
@@ -113,8 +128,10 @@ jobs:
             fi
             echo '| `SHA256SUMS.txt` | 各ファイルの SHA-256 |'
             echo
-            echo "変更点はアプリ内の「更新履歴」を参照。"
-            echo
+            if [ ! -s notes/release-notes.md ]; then
+              echo "変更点はアプリ内の「更新履歴」を参照。"
+              echo
+            fi
             echo "- master 系(FixPatch)の最新: https://github.com/${GITHUB_REPOSITORY}/releases/latest"
             echo "- old-ui 系の一覧(新しい順): https://github.com/${GITHUB_REPOSITORY}/releases?q=old-ui&expanded=true"
           } > release-body.md
