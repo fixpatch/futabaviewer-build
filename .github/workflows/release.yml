@@ -85,20 +85,35 @@ jobs:
           cd dist
           sha256sum -- * | tee SHA256SUMS.txt
 
+      - name: 説明文
+        env:
+          TAG: ${{ inputs.tag }}
+          LINE: ${{ needs.resolve.outputs.line }}
+        run: |
+          {
+            echo "FutabaViewer ${TAG}"
+            echo
+            echo "| ファイル | 内容 |"
+            echo "|---|---|"
+            echo '| `*-new-signature.apk` | Android 新署名版 |'
+            echo '| `*-zipsigner.apk` | Android ZipSigner版(旧署名) |'
+            if [ "$LINE" = master ]; then
+              echo '| `FutabaViewer-Windows-*.exe` / `.msi` | Windows インストーラー |'
+              echo '| `FutabaViewer-iOS-*.ipa` | iOS(SideStore 用の未署名 IPA) |'
+            fi
+            echo '| `SHA256SUMS.txt` | 各ファイルの SHA-256 |'
+            echo
+            echo "変更点はアプリ内の「更新履歴」を参照。"
+            echo
+            echo "- master 系(FixPatch)の最新: https://github.com/${GITHUB_REPOSITORY}/releases/latest"
+            echo "- old-ui 系の一覧(新しい順): https://github.com/${GITHUB_REPOSITORY}/releases?q=old-ui&expanded=true"
+          } > release-body.md
+
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ inputs.tag }}
           name: ${{ inputs.tag }}
-          body: |
-            FutabaViewer ${{ inputs.tag }}
-
-            | ファイル | 内容 |
-            |---|---|
-            | `*-new-signature.apk` | Android 新署名版 |
-            | `*-zipsigner.apk` | Android ZipSigner版(旧署名) |
-            | `FutabaViewer-Windows-*.exe` / `.msi` | Windows インストーラー |
-            | `FutabaViewer-iOS-*.ipa` | iOS(SideStore 用の未署名 IPA) |
-            | `SHA256SUMS.txt` | 各ファイルの SHA-256 |
-
-            変更点はアプリ内の「更新履歴」を参照。
+          body_path: release-body.md
+          # GitHub の Latest は1つだけなので master 系(FixPatch)に固定する。old-ui を出しても Latest は動かない。
+          make_latest: ${{ needs.resolve.outputs.line == 'master' && 'true' || 'false' }}
           files: dist/*

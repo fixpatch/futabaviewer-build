@@ -14,6 +14,15 @@ It does not contain application source code.
 ふたばビューア改のビルド基盤(CI の workflow・CI 用スクリプト・ビルド手順)を置くリポジトリ。
 アプリのソースは非公開リポジトリ(場所は Secret `SOURCE_REPOSITORY` で渡す)にあり、workflow が読み取り専用トークンで取得してビルドする。
 
+### ダウンロード
+
+| 系統 | 最新 |
+|---|---|
+| master 系(FixPatch〇〇)| [releases/latest](https://github.com/fixpatch/futabaviewer-build/releases/latest) |
+| old-ui 系(old-ui〇〇)| [old-ui の Release 一覧(新しい順)](https://github.com/fixpatch/futabaviewer-build/releases?q=old-ui&expanded=true) |
+
+GitHub の「Latest」は1つしか付けられないので、master 系に固定している(old-ui を出しても Latest は移らない)。
+
 | workflow | 起動 | 成果物 |
 |---|---|---|
 | [Release](.github/workflows/release.yml) | 本体で `FixPatch〇〇` / `old-ui〇〇` のタグを push(または手動) | Release に APK(新署名版・ZipSigner版)、master 系は Windows インストーラーと iOS IPA も |
