@@ -1,0 +1,69 @@
+# Windows のインストーラー(.exe / .msi)を作る(再利用 workflow)。
+name: Windows installer (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      source_ref:
+        type: string
+        required: true
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: ビルド基盤(このリポジトリ)
+        uses: actions/checkout@v5
+
+      - name: 本体の場所(Secret SOURCE_REPOSITORY)の確認
+        shell: bash
+        env:
+          SOURCE_REPOSITORY: ${{ secrets.SOURCE_REPOSITORY }}
+        run: test -n "$SOURCE_REPOSITORY" || { echo "::error::Secret SOURCE_REPOSITORY(本体の owner/名前)が未設定"; exit 1; }
+
+      - name: 本体のソース(非公開)
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ secrets.SOURCE_REPOSITORY }}
+          ref: ${{ inputs.source_ref }}
+          token: ${{ secrets.FUTABAVIEWER_SOURCE_TOKEN }}
+          path: source
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          # jpackage(インストーラー)もこの JDK から使う。
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          build-scan-publish: false
+
+      - name: 準備(local.properties / Android SDK)
+        env:
+          CACHE_SERVER_APP_TOKEN_NEW: ${{ secrets.CACHE_SERVER_APP_TOKEN_NEW }}
+        run: ./scripts/windows/prepare.ps1 -SourceDir source
+
+      # fvruntime.dll・Media Foundation ブリッジ(どちらも Visual Studio の C++ ツールでビルド)・WiX は Gradle が用意する。
+      - name: Build installers
+        working-directory: source
+        run: ./gradlew.bat --no-daemon :app-desktop:packageExeWithUserDataPrompt :app-desktop:packageMsiWithUserDataPrompt --console=plain
+
+      - name: 成果物の名前を付ける
+        run: ./scripts/windows/stage-installers.ps1 -SourceDir source
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: windows-installer
+          path: out/*
+          if-no-files-found: error
+          retention-days: ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }}
+
+      - name: 後片付け
+        if: always()
+        run: Remove-Item -LiteralPath source/local.properties -Force -ErrorAction SilentlyContinue

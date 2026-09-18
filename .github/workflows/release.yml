@@ -1,0 +1,104 @@
+# 本体(非公開)のタグから、配布物をまとめて作ってこのリポジトリの Release に置く。
+#
+# - FixPatch〇〇 … master 系: Android APK(新署名版 / ZipSigner版)+ Windows インストーラー + iOS IPA
+# - old-ui〇〇   … old-ui 系: Android APK(新署名版 / ZipSigner版)だけ
+#
+# 本体のタグ push で本体側の dispatch-build.yml がこれを起動する。手動でも Run workflow から動かせる。
+name: Release
+run-name: Release ${{ inputs.tag }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 本体のタグ(FixPatch〇〇 / old-ui〇〇)
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      line: ${{ steps.resolve.outputs.line }}
+    steps:
+      - id: resolve
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if ! [[ "$TAG" =~ ^(FixPatch|old-ui)[0-9A-Za-z._-]*$ ]]; then
+            echo "::error::タグは FixPatch〇〇 か old-ui〇〇 にしてください"
+            exit 1
+          fi
+          case "$TAG" in
+            FixPatch*) echo "line=master" >> "$GITHUB_OUTPUT" ;;
+            old-ui*)   echo "line=old-ui" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+  android:
+    needs: resolve
+    uses: ./.github/workflows/_android.yml
+    with:
+      source_ref: ${{ inputs.tag }}
+      line: ${{ needs.resolve.outputs.line }}
+    secrets: inherit
+
+  windows:
+    needs: resolve
+    if: needs.resolve.outputs.line == 'master'
+    uses: ./.github/workflows/_windows.yml
+    with:
+      source_ref: ${{ inputs.tag }}
+    secrets: inherit
+
+  ios:
+    needs: resolve
+    if: needs.resolve.outputs.line == 'master'
+    uses: ./.github/workflows/_ios.yml
+    with:
+      source_ref: ${{ inputs.tag }}
+      configuration: Release
+    secrets: inherit
+
+  publish:
+    needs: [resolve, android, windows, ios]
+    # old-ui は Android だけ、master は3つ全部が成功したときだけ公開する(欠けた Release を作らない)。
+    if: >-
+      always() &&
+      needs.android.result == 'success' &&
+      (needs.resolve.outputs.line == 'old-ui' ||
+       (needs.windows.result == 'success' && needs.ios.result == 'success'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: チェックサム
+        run: |
+          cd dist
+          sha256sum -- * | tee SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ inputs.tag }}
+          name: ${{ inputs.tag }}
+          body: |
+            FutabaViewer ${{ inputs.tag }}
+
+            | ファイル | 内容 |
+            |---|---|
+            | `*-new-signature.apk` | Android 新署名版 |
+            | `*-zipsigner.apk` | Android ZipSigner版(旧署名) |
+            | `FutabaViewer-Windows-*.exe` / `.msi` | Windows インストーラー |
+            | `FutabaViewer-iOS-*.ipa` | iOS(SideStore 用の未署名 IPA) |
+            | `SHA256SUMS.txt` | 各ファイルの SHA-256 |
+
+            変更点はアプリ内の「更新履歴」を参照。
+          files: dist/*

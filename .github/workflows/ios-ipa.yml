@@ -1,0 +1,31 @@
+# iOS の IPA だけを試しに作る(Release には置かない。Artifacts から取る)。
+# 配布用はタグから動く release.yml を使う。
+name: iOS IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 本体(futabaviewer)のブランチ / タグ / コミット
+        required: true
+        default: master
+      configuration:
+        description: ビルド構成
+        type: choice
+        options: [Release, Debug]
+        default: Release
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-ipa-${{ inputs.source_ref }}-${{ inputs.configuration }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    uses: ./.github/workflows/_ios.yml
+    with:
+      source_ref: ${{ inputs.source_ref }}
+      configuration: ${{ inputs.configuration }}
+    secrets: inherit

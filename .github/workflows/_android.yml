@@ -1,0 +1,76 @@
+# Android のリリース APK を作り、新署名版と ZipSigner 版の2つにする(再利用 workflow)。
+# 手順は本体の release.ps1 と同じ: assembleRelease(testkey 署名)→ ZipSigner の旧鍵で署名し直した物を作る。
+name: Android APK (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      source_ref:
+        type: string
+        required: true
+      line:
+        description: master / old-ui
+        type: string
+        required: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: ビルド基盤(このリポジトリ)
+        uses: actions/checkout@v5
+
+      - name: 本体の場所(Secret SOURCE_REPOSITORY)の確認
+        shell: bash
+        env:
+          SOURCE_REPOSITORY: ${{ secrets.SOURCE_REPOSITORY }}
+        run: test -n "$SOURCE_REPOSITORY" || { echo "::error::Secret SOURCE_REPOSITORY(本体の owner/名前)が未設定"; exit 1; }
+
+      - name: 本体のソース(非公開)
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ secrets.SOURCE_REPOSITORY }}
+          ref: ${{ inputs.source_ref }}
+          token: ${{ secrets.FUTABAVIEWER_SOURCE_TOKEN }}
+          path: source
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          # old-ui は Gradle 8.9 / AGP 8.7.3 のまま据え置いているので JDK 17、master は開発機と同じ 21。
+          java-version: ${{ inputs.line == 'old-ui' && '17' || '21' }}
+
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          build-scan-publish: false
+
+      - name: 準備(SDK / NDK / 署名鍵 / ランタイム素材)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_RUNTIME_MATERIAL_BASE64: ${{ secrets.ANDROID_RUNTIME_MATERIAL_BASE64 }}
+        run: bash scripts/android/prepare.sh source "${{ inputs.line }}"
+
+      - name: Build release APK
+        working-directory: source
+        run: bash ./gradlew --no-daemon :app:assembleRelease --console=plain
+
+      - name: 署名(新署名版 / ZipSigner版)と照合
+        env:
+          ZIPSIGNER_PK8_BASE64: ${{ secrets.ZIPSIGNER_PK8_BASE64 }}
+          ZIPSIGNER_CERT_BASE64: ${{ secrets.ZIPSIGNER_CERT_BASE64 }}
+          NEW_SIGNER_CERT_SHA256: ${{ vars.NEW_SIGNER_CERT_SHA256 }}
+          ZIPSIGNER_CERT_SHA256: ${{ vars.ZIPSIGNER_CERT_SHA256 }}
+        run: bash scripts/android/sign-and-stage.sh source
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: android-apk-${{ inputs.line }}
+          path: out/*.apk
+          if-no-files-found: error
+          retention-days: ${{ vars.ARTIFACT_RETENTION_DAYS || 7 }}
+
+      - name: 後片付け
+        if: always()
+        run: rm -f source/testkey.keystore source/runtime/src/main/cpp/runtime_material.inc
