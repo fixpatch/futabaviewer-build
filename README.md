@@ -48,11 +48,17 @@ It does not contain application source code.
 
 #### 補足
 
+- **APK / IPA / INSTALLER**: アプリ本体。これを入れれば使える。
+- **OBTAINIUM**: Android の自動アップデート用。登録しておくと新しい版が出たときに更新できる。
+- **LIVECONTAINER / SIDESTORE**: iOS で署名を切らさずに使い続けるためのもの(無料の Apple ID の署名は7日で切れる)。ソースを登録すると更新も届く。
+- Windows 版はアプリ自身が起動時に新しい版を確かめる(タイトルバーに「更新あり」)。
+
+#### 仕組み
+
 - ボタンは [GitHub Pages の中継ページ](docs/get/index.html)を通る。README には http(s) のリンクしか置けず(`obtainium://` などは消される)、
   配布物のファイル名には版が入るので、中継ページが「その系統の最新 Release」を引いて本物へ飛ばす。
 - Obtainium は Release の名前(`^FixPatch` / `^old-ui`)で系統だけを絞る。APK は絞らないので、更新の時に新署名版 / ZipSigner版のどちらを入れるか選ぶ画面が出る。
 - iOS のソース: `https://github.com/fixpatch/futabaviewer-build/releases/latest/download/source.json`(LiveContainer / SideStore / AltStore)。
-- Windows 版はアプリの起動時に新しい版を確かめ、タイトルバーに「更新あり」を出す(押すとインストーラーを落として入れ替える)。
 - GitHub の「Latest」は1つしか付けられないので、master 系に固定している(old-ui を出しても Latest は移らない)。
 
 | workflow | 起動 | 成果物 |
