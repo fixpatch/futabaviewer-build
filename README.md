@@ -40,6 +40,18 @@ It does not contain application source code.
 
 [![Get it on Obtainium](https://img.shields.io/badge/GET_IT_ON-Obtainium-7F57C2?style=for-the-badge&logo=obtainium&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?app=obtainium&line=old-ui) [![Download APK](https://img.shields.io/badge/DOWNLOAD-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://fixpatch.github.io/futabaviewer-build/get/?line=old-ui&file=apk)
 
+#### Stable(過去の安定版・Android のみ)
+
+更新はしない固定の版。Obtainium と上のボタンの対象外。
+
+**FixPatch19-6** — マルチプラットフォーム化(FixPatch20)より前の最終版。当時配布した APK そのもの。FixPatch 系と同じアプリなので、20 以降から戻すにはアンインストールが要る。
+
+[![Download APK](https://img.shields.io/badge/DOWNLOAD-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/fixpatch/futabaviewer-build/releases/download/Stable-FixPatch19-6/FutabaViewer-FixPatch19-6-new-signature.apk) [![Release](https://img.shields.io/badge/Release-Stable--FixPatch19--6-555555?style=for-the-badge&logo=github&logoColor=white)](https://github.com/fixpatch/futabaviewer-build/releases/tag/Stable-FixPatch19-6)
+
+**FixPatch18-7d3** — 2023年に公開した旧UIの最終版に、投稿まわりの不具合だけ最小限の修正を加えた版。別アプリ(「ふたば 18-7d」)なので old-ui 系・FixPatch 系と同時に入れられる。
+
+[![Download APK](https://img.shields.io/badge/DOWNLOAD-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/fixpatch/futabaviewer-build/releases/download/Stable-FixPatch18-7d3/FutabaViewer-FixPatch18-7d3-new-signature.apk) [![Release](https://img.shields.io/badge/Release-Stable--FixPatch18--7d3-555555?style=for-the-badge&logo=github&logoColor=white)](https://github.com/fixpatch/futabaviewer-build/releases/tag/Stable-FixPatch18-7d3)
+
 - ボタンは [GitHub Pages の中継ページ](docs/get/index.html)を通る。README には http(s) のリンクしか置けず(`obtainium://` などは消される)、
   配布物のファイル名には版が入るので、中継ページが「その系統の最新 Release」を引いて本物へ飛ばす。
 - Obtainium は Release の名前(`^FixPatch` / `^old-ui`)で系統だけを絞る。APK は絞らないので、更新の時に新署名版 / ZipSigner版のどちらを入れるか選ぶ画面が出る。
