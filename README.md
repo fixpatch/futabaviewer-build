@@ -41,9 +41,9 @@ Obtainium と上のボタンの対象外。ZipSigner版などは版名のリン�
 - [FixPatch19‑6](https://github.com/fixpatch/futabaviewer-build/releases/tag/Stable-FixPatch19-6)
     - マルチプラットフォーム化前の最終板。
     - FixPatch系統(20以降から戻すにはアンインストールが必要)
-- [FixPatch18‑7d3](https://github.com/fixpatch/futabaviewer-build/releases/tag/Stable-FixPatch18-7d3)
-    - 2023年の最終版から投稿に関する不具合の修正を行った版。
-    - old-ui・FixPatchと同時にインストールできるようにした。
+- [FixPatch18‑7d4](https://github.com/fixpatch/futabaviewer-build/releases/tag/Stable-FixPatch18-7d4)
+    - 2023年の最終版から投稿に関する不具合と設定画面が開けない不具合を修正した版。
+    - old-ui・FixPatchと同時にインストールできる。
 
 #### 補足
 
