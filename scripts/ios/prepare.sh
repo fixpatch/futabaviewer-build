@@ -1,6 +1,8 @@
 #!/bin/bash
 # iOS ビルドの前準備。引数 = 本体ソースのディレクトリ。
 #
+# - local.properties: キャッシュ API の App トークンの材料(本体 app-ios/setup-runtime-component.sh)が
+#   cacheServerAppTokenNew を読む。無いと材料が入らず、配布版で過去スレ検索が 404 になる(FixPatch20-3 で発生)。
 # - Android SDK の compileSdk プラットフォーム: iOS のビルドでも Gradle の構成時に Android モジュールを読むため。
 # - Google Drive 同期の OAuth plist: Secrets にあれば本体の memo/google_oauth/ へ置く(無くてもビルドは通る)。
 #
@@ -8,6 +10,14 @@
 set -euo pipefail
 
 source_dir=${1:?本体ソースのディレクトリを指定してください}
+
+token=${CACHE_SERVER_APP_TOKEN_NEW:-}
+if ! [[ "$token" =~ ^[0-9a-f]{64}$ ]]; then
+    echo "::error::Secret CACHE_SERVER_APP_TOKEN_NEW が無いか、64桁の小文字16進ではありません(docs/SECRETS.md)"
+    exit 1
+fi
+printf 'cacheServerAppTokenNew=%s\n' "$token" > "$source_dir/local.properties"
+unset token
 
 if [ -n "${ANDROID_HOME:-}" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
     # `yes` はパイプが閉じると SIGPIPE で終わるので、pipefail で失敗扱いにならないよう包む。

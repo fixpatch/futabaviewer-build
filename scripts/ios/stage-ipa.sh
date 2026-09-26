@@ -9,6 +9,14 @@ configuration=${2:?構成を指定してください}
 
 ipa="$source_dir/app-ios/dist/FutabaViewer.ipa"
 test -f "$ipa" || { echo "::error::IPA がありません: $ipa"; exit 1; }
+# キャッシュ API の App トークンの材料が入っているか。無いと standalone の過去スレ検索が 404 になる
+# (FixPatch20-3 はこれが無いまま出ていた)。中身(暗号文)は見ない。
+# 一覧は変数へ取ってから探す(`unzip | grep -q` だと grep が先に抜けて pipefail で失敗扱いになり得る)。
+listing=$(unzip -Z1 "$ipa")
+if ! grep -qx 'Payload/[^/]*\.app/runtime_material\.json' <<< "$listing"; then
+    echo "::error::IPA に runtime_material.json がありません(CACHE_SERVER_APP_TOKEN_NEW と本体の setup-runtime-component.sh)"
+    exit 1
+fi
 
 # 版は表示名の最後の語(例: "3.0.2β FixPatch20" → FixPatch20)。表示名は本体の version.properties の versionName。
 # version.properties が無い古いタグ(FixPatch20-1 まで)は AppServicesIos.kt の定数から読む。
