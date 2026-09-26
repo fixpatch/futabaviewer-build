@@ -10,11 +10,15 @@ configuration=${2:?構成を指定してください}
 ipa="$source_dir/app-ios/dist/FutabaViewer.ipa"
 test -f "$ipa" || { echo "::error::IPA がありません: $ipa"; exit 1; }
 # キャッシュ API の App トークンの材料が入っているか。無いと standalone の過去スレ検索が 404 になる
-# (FixPatch20-3 はこれが無いまま出ていた)。中身(暗号文)は見ない。
-# 一覧は変数へ取ってから探す(`unzip | grep -q` だと grep が先に抜けて pipefail で失敗扱いになり得る)。
-listing=$(unzip -Z1 "$ipa")
-if ! grep -qx 'Payload/[^/]*\.app/runtime_material\.json' <<< "$listing"; then
-    echo "::error::IPA に runtime_material.json がありません(CACHE_SERVER_APP_TOKEN_NEW と本体の setup-runtime-component.sh)"
+# (FixPatch20-3 はこれが無いまま出ていた)。材料は本体の fvruntime.c がアプリ本体のバイナリの
+# __DATA,__fvx0〜2 セクションへ置く(材料が無いビルドではセクション自体ができない)。中身は見ない。
+binary=$(mktemp)
+unzip -p "$ipa" 'Payload/FutabaViewer.app/FutabaViewer' > "$binary"
+# 一覧は変数へ取ってから探す(`otool | grep -q` だと grep が先に抜けて pipefail で失敗扱いになり得る)。
+load_commands=$(otool -l "$binary")
+rm -f "$binary"
+if ! grep -q 'sectname __fvx0' <<< "$load_commands"; then
+    echo "::error::IPA に App トークンの材料がありません(CACHE_SERVER_APP_TOKEN_NEW と本体の setup-runtime-component.sh)"
     exit 1
 fi
 

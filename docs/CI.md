@@ -87,7 +87,7 @@
 | `runtime_material.inc is missing` | `ANDROID_RUNTIME_MATERIAL_BASE64` |
 | `の署名証明書が期待と違います` | 鍵の Secret と照合値の Variables の組み合わせ |
 | Windows の `cacheServerAppTokenNew must be 64 lowercase hexadecimal` | `CACHE_SERVER_APP_TOKEN_NEW` |
-| iOS の `CACHE_SERVER_APP_TOKEN_NEW が無いか` / `IPA に runtime_material.json がありません` | `CACHE_SERVER_APP_TOKEN_NEW` |
+| iOS の `CACHE_SERVER_APP_TOKEN_NEW が無いか` / `IPA に App トークンの材料がありません` / Xcode の `Release では App トークンが必須` | `CACHE_SERVER_APP_TOKEN_NEW` |
 | iOS の `Kotlin/Native` のリンクで Killed / OutOfMemoryError | `IOS_RUNNER` が Intel(14GB)か。だめなら `IOS_GRADLE_JVMARGS` を下げる |
 | iOS の Xcode の版が合わない | 本体の LastUpgradeCheck は 2600 = Xcode 26。`IOS_RUNNER` / `IOS_XCODE_VERSION` |
 | iOS の `verify-ipa.py` の Forbidden text | 個人情報の文字列が IPA に入っている。どのファイルかがログに出る |

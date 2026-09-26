@@ -78,10 +78,10 @@ ZipSigner 版(旧署名)の鍵と証明書。`release.ps1` と同じ `K:\APK-Mul
 `local.properties` の `cacheServerAppTokenNew`(64桁の小文字16進)として置く。
 
 - Windows: `fvruntime.dll` の素材生成が読む。
-- iOS: 本体 `app-ios/setup-runtime-component.sh` が IPA の `runtime_material.json` を作る。未署名 IPA では
-  チームIDではなく元のバンドルIDに縛るので、SideStore / LiveContainer が署名し直しても復号できる。
-  無いと standalone の過去スレ検索(`/api/search`)が 404 になる(FixPatch20-3 で発生)。
-  `scripts/ios/stage-ipa.sh` が IPA に材料が無ければ止める。
+- iOS: 本体 `app-ios/setup-runtime-component.sh` が材料を分けて隠した C のヘッダーを作り、`fvruntime.c` と一緒に
+  アプリ本体のバイナリへ入る(Android / Windows と同じ作り。配布 IPA は SideStore / LiveContainer が署名し直すので、
+  配布物への照合は持たない)。無いと standalone の過去スレ検索(`/api/search`)が 404 になる(FixPatch20-3 で発生)。
+  Release では本体のビルドが止まり、`scripts/ios/stage-ipa.sh` も IPA に材料が無ければ止める。
 
 ```powershell
 (Select-String -LiteralPath 'K:\dev\local_repository\futabaviewer\local.properties' -Pattern '^cacheServerAppTokenNew=(.+)$').Matches[0].Groups[1].Value.Trim() | gh secret set CACHE_SERVER_APP_TOKEN_NEW --repo fixpatch/futabaviewer-build
