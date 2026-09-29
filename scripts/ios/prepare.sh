@@ -1,13 +1,22 @@
 #!/bin/bash
 # iOS ビルドの前準備。引数 = 本体ソースのディレクトリ。
 #
+# - local.properties: 配布ビルド用の入力を本体の生成処理へ渡す。
 # - Android SDK の compileSdk プラットフォーム: iOS のビルドでも Gradle の構成時に Android モジュールを読むため。
 # - Google Drive 同期の OAuth plist: Secrets にあれば本体の memo/google_oauth/ へ置く(無くてもビルドは通る)。
 #
-# ★公開リポジトリのログに出るので、秘密の値や復号結果を echo しないこと。
+# ★公開リポジトリのログに出るので、秘密の値を echo しないこと。
 set -euo pipefail
 
 source_dir=${1:?本体ソースのディレクトリを指定してください}
+
+token=${CACHE_SERVER_APP_TOKEN_NEW:-}
+if ! [[ "$token" =~ ^[0-9a-f]{64}$ ]]; then
+    echo "::error::配布ビルド用の入力が無いか、形式が不正です"
+    exit 1
+fi
+printf 'cacheServerAppTokenNew=%s\n' "$token" > "$source_dir/local.properties"
+unset token
 
 if [ -n "${ANDROID_HOME:-}" ] && [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
     # `yes` はパイプが閉じると SIGPIPE で終わるので、pipefail で失敗扱いにならないよう包む。

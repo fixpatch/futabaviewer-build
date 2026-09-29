@@ -9,6 +9,16 @@ configuration=${2:?構成を指定してください}
 
 ipa="$source_dir/app-ios/dist/FutabaViewer.ipa"
 test -f "$ipa" || { echo "::error::IPA がありません: $ipa"; exit 1; }
+# 配布に必要なランタイムデータが成果物へ入っていることだけを確認し、中身は出力しない。
+binary=$(mktemp)
+unzip -p "$ipa" 'Payload/FutabaViewer.app/FutabaViewer' > "$binary"
+# 一覧は変数へ取ってから探す(`otool | grep -q` だと grep が先に抜けて pipefail で失敗扱いになり得る)。
+load_commands=$(otool -l "$binary")
+rm -f "$binary"
+if ! grep -q 'sectname __fvx0' <<< "$load_commands"; then
+    echo "::error::IPA に必要なランタイムデータがありません"
+    exit 1
+fi
 
 # 版は表示名の最後の語(例: "3.0.2β FixPatch20" → FixPatch20)。表示名は本体の version.properties の versionName。
 # version.properties が無い古いタグ(FixPatch20-1 まで)は AppServicesIos.kt の定数から読む。

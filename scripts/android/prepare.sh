@@ -4,10 +4,10 @@
 # - SDK / NDK / CMake: NDK は同梱 .so の strip に要る(無いと本体の build.gradle が release を止める)。
 #   master は :runtime のネイティブ部品のために CMake も要る。
 # - testkey.keystore: 新署名版の鍵(本体の app/build.gradle が参照する)。
-# - runtime_material.inc(master だけ): キャッシュ API の App トークンを署名証明書に縛って暗号化した素材。
-#   無いと :runtime の CMake が FATAL_ERROR で止まる。
+# - runtime_material.inc(master だけ): リリースビルドに必要な入力。
+#   無いと :runtime の CMake が止まる。
 #
-# ★公開リポジトリのログに出るので、秘密の値や復号結果を echo しないこと。
+# ★公開リポジトリのログに出るので、秘密の値を echo しないこと。
 set -euo pipefail
 
 source_dir=${1:?本体ソースのディレクトリを指定してください}

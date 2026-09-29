@@ -1,7 +1,6 @@
 # Windows インストーラーのビルドの前準備。
 #
-# - local.properties: fvruntime.dll の素材生成(本体 tools/configure-desktop-runtime-component.ps1)が
-#   cacheServerAppTokenNew を読む。無いと Gradle の入力ファイル不足で止まる。
+# - local.properties: 本体のリリース用生成処理が読む。
 # - Android SDK: Gradle の構成時に Android モジュールも読むので compileSdk のプラットフォームを入れておく。
 #
 # ★公開リポジトリのログに出るので、秘密の値を出力しないこと。
@@ -13,7 +12,7 @@ $ErrorActionPreference = 'Stop'
 
 $token = [string]$env:CACHE_SERVER_APP_TOKEN_NEW
 if ($token -notmatch '^[0-9a-f]{64}$') {
-    throw 'Secret CACHE_SERVER_APP_TOKEN_NEW が無いか、64桁の小文字16進ではありません(docs/SECRETS.md)'
+    throw '配布ビルド用の入力が無いか、形式が不正です'
 }
 [IO.File]::WriteAllText((Join-Path $SourceDir 'local.properties'), "cacheServerAppTokenNew=$token`n", [Text.Encoding]::ASCII)
 Remove-Variable token
