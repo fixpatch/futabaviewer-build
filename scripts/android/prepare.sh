@@ -29,7 +29,7 @@ if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
 fi
 printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$source_dir/testkey.keystore"
 
-if [ "$line" = master ]; then
+if [ -f "$source_dir/runtime/src/main/cpp/CMakeLists.txt" ]; then
     if [ -z "${ANDROID_RUNTIME_MATERIAL_BASE64:-}" ]; then
         echo "::error::Secret ANDROID_RUNTIME_MATERIAL_BASE64 がありません(docs/SECRETS.md)"
         exit 1
