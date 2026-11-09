@@ -48,6 +48,30 @@
 - **Release**: Actions → Release → Run workflow → `tag` にタグ名。途中で落ちたときのやり直しもこれ(Release は同じタグ名へ上書き添付)。
 - **iOS IPA だけ試す**: Actions → iOS IPA → Run workflow(ブランチ/コミットと構成を選ぶ。Release には置かず Artifacts のみ)。
 
+### 旧版 Stable の手動リリース
+
+「old-futabaviewerをリリースして」という指示は、特に指定がなければ以下の**下書き作成**を意味する。通常の CI、公開、Latest、Pre-release への変更は行わない。
+通常の本体タグ `FixPatch*` / `old-ui*` は上記の CI 起動用。`Stable*` はその経路に流さない。
+
+1. 実機で投稿などを確認し、ユーザーが承認したビルド済み APK の新署名版・ZipSigner 版と、元の `SHA256SUMS.txt` をそのまま使う。承認後は必要がない限り再ビルドせず、再ビルドが必要なら承認済み成果物と区別して再確認する。
+2. **この公開ビルドリポジトリの `main`** で README の Stable 項目を最終版名と正規リンク `https://github.com/fixpatch/futabaviewer-build/releases/tag/Stable-FixPatch18-7dN` に更新し、コミット・push する。そのコミットに公開タグ `Stable-FixPatch18-7dN` を作成・push する。本体ソース側のタグではない。
+3. 次の英語名の3ファイルを添付し、下書きを作る。`N` は対象の版番号に置き換える。コマンドはこのリポジトリで、成果物を参照できる場所から実行する。
+
+   ```powershell
+   gh release create Stable-FixPatch18-7dN `
+     FutabaViewer-FixPatch18-7dN-new-signature.apk `
+     FutabaViewer-FixPatch18-7dN-zipsigner.apk `
+     SHA256SUMS.txt `
+     --repo fixpatch/futabaviewer-build `
+     --title "FixPatch18-7dN" `
+     --notes "確認済みの旧版 Stable APK（新署名版・ZipSigner版）と SHA-256。" `
+     --draft --latest=false --verify-tag
+   ```
+
+4. 設定は **`draft=true`、`prerelease=false`、`make_latest=false`（Release ラベル None）** とする。`--prerelease` は付けない。ユーザーが公開するまで下書きのまま保持し、自動公開しない。
+
+下書きは一般利用者には見えないため、README の新しい正規リンクもユーザーが公開するまでは一般利用者から開けない。これは下書き運用による一時的な状態であり、公開済み扱いの告知はしない。
+
 ## Release に置くファイル
 
 | ファイル | 内容 |
@@ -73,7 +97,7 @@
 
 ## 公開リポジトリとしての注意
 
-- **ビルドログと Artifacts / Releases は誰でも見られる。** Release に置いた物は一般公開になる。
+- **ビルドログと Artifacts / 公開済み Releases は誰でも見られる。** Release の下書きは一般公開されず、公開すると添付ファイルも一般公開になる。
 - GitHub-hosted runner の利用条件(このリポジトリに関係するソフトウェアのビルド・テスト・配布に使うこと)に沿うよう、
   このリポジトリは FutabaViewer の正式なビルド基盤として workflow・スクリプト・手順を管理する。
 - workflow は `workflow_dispatch` だけ。PR やフォークからは動かない。
