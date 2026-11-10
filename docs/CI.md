@@ -53,18 +53,17 @@
 「old-futabaviewerをリリースして」という指示は、特に指定がなければ以下の**手動公開（Release ラベル None）**を意味する。通常の CI は使わず、Latest・Pre-releaseは付けない。
 通常の本体タグ `FixPatch*` / `old-ui*` は上記の CI 起動用。`Stable*` はその経路に流さない。
 
-1. 実機で投稿などを確認し、ユーザーが承認したビルド済み APK の新署名版・ZipSigner 版と、元の `SHA256SUMS.txt` をそのまま使う。承認後は必要がない限り再ビルドせず、再ビルドが必要なら承認済み成果物と区別して再確認する。
+1. 18-7dXはReleaseビルドの**新署名APKだけ**を作成する。ZipSigner版は作成もアップロードもしない。ユーザー確認済みのAPKがあればそのまま使い、再ビルド・再署名しない。`SHA256SUMS.txt`には配布する新署名APKのハッシュだけを記載し、既存の一覧にZipSigner版があればその記載だけを除く。
 2. **この公開ビルドリポジトリの `main`** で README の Stable 項目を最終版名と正規リンク `https://github.com/fixpatch/futabaviewer-build/releases/tag/Stable-FixPatch18-7dN` に更新し、コミット・push する。そのコミットに公開タグ `Stable-FixPatch18-7dN` を作成・push する。本体ソース側のタグではない。
-3. 次の英語名の3ファイルを添付し、公開リリースを作る。`N` は対象の版番号に置き換える。コマンドはこのリポジトリで、成果物を参照できる場所から実行する。
+3. 次の英語名の2ファイルを添付し、公開リリースを作る。`N` は対象の版番号に置き換える。コマンドはこのリポジトリで、成果物を参照できる場所から実行する。
 
    ```powershell
    gh release create Stable-FixPatch18-7dN `
      FutabaViewer-FixPatch18-7dN-new-signature.apk `
-     FutabaViewer-FixPatch18-7dN-zipsigner.apk `
      SHA256SUMS.txt `
      --repo fixpatch/futabaviewer-build `
      --title "FixPatch18-7dN" `
-     --notes "確認済みの旧版 Stable APK（新署名版・ZipSigner版）と SHA-256。" `
+     --notes "確認済みの旧版 Stable APK（新署名版のみ）と SHA-256。" `
      --latest=false --verify-tag
    ```
 
@@ -77,7 +76,7 @@
 | ファイル | 内容 |
 |---|---|
 | `FutabaViewer-<ラベル>-new-signature.apk` | 新署名版(`testkey.keystore`)。`release.ps1` の「新署名版」と同じ |
-| `FutabaViewer-<ラベル>-zipsigner.apk` | ZipSigner 版(旧鍵で署名し直し)。`release.ps1` の「ZipSigner版」と同じ |
+| `FutabaViewer-<ラベル>-zipsigner.apk` | FixPatch・old-uiのみ。ZipSigner版(旧鍵で署名し直し)。18-7dXでは作成・添付しない |
 | `FutabaViewer-Windows-<ラベル>.exe` / `.msi` | Windows インストーラー(master 系のみ) |
 | `FutabaViewer-<版>-Release-<コミット>.ipa` | iOS 未署名 IPA(master 系のみ) |
 | `SHA256SUMS.txt` | 上の全ファイルの SHA-256 |
