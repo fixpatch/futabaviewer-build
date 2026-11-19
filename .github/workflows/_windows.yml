@@ -37,8 +37,11 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          # jpackage(インストーラー)もこの JDK から使う。
+          # jpackage(インストーラー)もこの JDK から使う。同梱 Java になるので、ランナーに入っている
+          # 古い 21 ではなく最新の 21 を取る(本体の packageMsiWithUserDataPrompt が 21.0.13.1 未満なら止める。
+          # CVE-2026-114938)。
           java-version: '21'
+          check-latest: true
 
       - uses: gradle/actions/setup-gradle@v5
         with:
